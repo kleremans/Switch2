@@ -2,10 +2,11 @@ name: Zelda Switch 2 monitor
 
 on:
   schedule:
-    # 4x per dag. GitHub gebruikt UTC: 07/11/15/19 UTC = 08/12/16/20 uur NL-wintertijd
-    # (in de zomertijd een uur later). Minuut 17 i.p.v. :00 omdat GitHub op het hele
-    # uur druk is en runs dan vertraagd raken.
-    - cron: "17 7,11,15,19 * * *"
+    # 8x per dag tussen 07:00 en 23:00 Nederlandse tijd: 08:17, 10:17, ... 22:17.
+    # GitHub rekent in UTC en kent geen zomer-/wintertijd, daarom start de cron elk
+    # uur tussen 06 en 21 UTC en laat de stap "Tijdvenster" alleen de juiste
+    # Nederlandse uren door. Minuut 17 omdat GitHub op het hele uur druk is.
+    - cron: "17 6-21 * * *"
   workflow_dispatch:
     inputs:
       test_notify:
@@ -26,17 +27,34 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Tijdvenster (NL-tijd)
+        id: window
+        run: |
+          hour=$(TZ=Europe/Amsterdam date +%H)
+          echo "Nederlandse tijd: $(TZ=Europe/Amsterdam date '+%H:%M')"
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            case "$hour" in
+              08|10|12|14|16|18|20|22) echo "run=true" >> "$GITHUB_OUTPUT" ;;
+              *) echo "Buiten het schema, overslaan."; echo "run=false" >> "$GITHUB_OUTPUT" ;;
+            esac
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.window.outputs.run == 'true'
 
       - uses: actions/setup-python@v5
+        if: steps.window.outputs.run == 'true'
         with:
           python-version: "3.12"
           cache: pip
 
       - run: pip install -r requirements.txt
+        if: steps.window.outputs.run == 'true'
 
       - name: Testmelding
-        if: ${{ inputs.test_notify }}
+        if: ${{ steps.window.outputs.run == 'true' && inputs.test_notify }}
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           NTFY_SERVER: ${{ vars.NTFY_SERVER }}
@@ -47,7 +65,7 @@ jobs:
         run: python monitor.py --test-notify
 
       - name: Webshops controleren
-        if: ${{ !inputs.test_notify }}
+        if: ${{ steps.window.outputs.run == 'true' && !inputs.test_notify }}
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           NTFY_SERVER: ${{ vars.NTFY_SERVER }}
@@ -58,7 +76,7 @@ jobs:
         run: python monitor.py --verbose
 
       - name: Status opslaan
-        if: ${{ !inputs.test_notify }}
+        if: ${{ steps.window.outputs.run == 'true' && !inputs.test_notify }}
         run: |
           git config user.name "zelda-monitor[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

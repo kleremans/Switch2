@@ -1,6 +1,6 @@
 # Zelda Switch 2 voorraad-monitor 🗡️🛡️
 
-Doorzoekt 4x per dag Nederlandse webshops op de **Nintendo Switch 2 – The Legend of
+Doorzoekt 8x per dag Nederlandse webshops op de **Nintendo Switch 2 – The Legend of
 Zelda 40th Anniversary Edition** en stuurt je direct een pushmelding op je telefoon
 zodra hij ergens op voorraad is.
 
@@ -58,14 +58,19 @@ Ga naar **Actions → Zelda Switch 2 monitor → Run workflow**:
 
 ## Tijden
 
-Standaard om 08:17, 12:17, 16:17 en 20:17 (Nederlandse wintertijd). Aanpassen in
-`.github/workflows/monitor.yml` (de `cron`-regel is in UTC).
+8x per dag tussen 07:00 en 23:00 Nederlandse tijd: **08:17, 10:17, 12:17, 14:17,
+16:17, 18:17, 20:17 en 22:17**, het hele jaar door (zomer- en wintertijd worden
+automatisch goed gezet).
 
-> 💡 Restocks zijn vaak binnen minuten weer uitverkocht. Wil je sneller zijn, zet de
-> cron dan bijvoorbeeld op elke 15 minuten: `"*/15 * * * *"`. Voor een publieke
-> repository is dat gratis; voor een privé-repository telt het mee voor je gratis
-> 2000 Actions-minuten per maand (één run duurt ±1–2 minuten, dus elk half uur
-> past nog net niet; elk uur wel).
+Hoe: GitHub rekent alleen in UTC, dus de workflow start elk uur tussen 06 en 21 UTC
+en de eerste stap ("Tijdvenster") laat alleen de bovenstaande Nederlandse uren door.
+De overige starts stoppen meteen. Andere uren nodig? Pas de lijst
+`08|10|12|...` in `.github/workflows/monitor.yml` aan.
+
+> 💡 Restocks zijn vaak binnen minuten weer uitverkocht. Hoe vaker je controleert,
+> hoe groter de kans dat je op tijd bent. Voor een publieke repository zijn Actions
+> gratis; bij een privé-repository heb je 2000 gratis minuten per maand, en dit
+> schema gebruikt er ongeveer 750–1000.
 
 ## Bekende beperkingen
 
