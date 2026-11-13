@@ -164,11 +164,14 @@ def find_candidates(html: str, base_url: str, cfg: dict) -> list[tuple[str, str]
     def consider(href: str, label: str) -> None:
         if not href or href.startswith(("javascript:", "mailto:", "#")):
             return
-        full = urljoin(base_url, href.replace("\\u002F", "/").replace("\\/", "/"))
+        href = href.replace("\\u002F", "/").replace("\\/", "/").rstrip("\\")
+        full = urljoin(base_url, href)
         host = urlparse(full).netloc.removeprefix("www.")
         if base_host not in host:
             return
         key = clean_url(full)
+        if any(part in key for part in cfg.get("exclude_url_parts") or []):
+            return
         text = f"{label} {urlparse(full).path.replace('-', ' ')} {urlparse(full).path}"
         if matches(text, cfg) and "zoeken" not in key and "search" not in key:
             if key not in found or len(label) > len(found[key]):
@@ -295,8 +298,27 @@ def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "")
     if st:
         res.status, res.source = st, "meta"
         return res
+    if os.getenv("DEBUG_UNKNOWN"):
+        res.note = debug_summary(soup)
     res.status, res.source = parse_text(soup), "text"
     return res
+
+
+def debug_summary(soup: BeautifulSoup) -> str:
+    """Compacte samenvatting van een pagina zonder herkenbare voorraadinfo."""
+    parts = []
+    for script in soup.find_all("script", type=re.compile("ld\\+json", re.I)):
+        try:
+            data = json.loads(script.string or script.get_text() or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        for node in _walk(data):
+            if "offers" in node or {"offer", "aggregateoffer"} & _types(node):
+                parts.append("LD:" + json.dumps(node.get("offers", node), ensure_ascii=False)[:300])
+    text = normalize(soup.get_text(" "))
+    for m in list(re.finditer("€", text))[:5]:
+        parts.append("TXT:" + text[max(0, m.start() - 60): m.end() + 30])
+    return " | ".join(parts)[:1500]
 
 
 # --------------------------------------------------------------------------- #

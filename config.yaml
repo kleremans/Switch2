@@ -46,6 +46,12 @@ match:
     - refurbished
     - gebruikt
 
+# Links met deze stukjes in de URL worden genegeerd
+# (Tweakers "aanbod" = tweedehands/particuliere verkoop, geen webshop).
+exclude_url_parts:
+  - /aanbod/
+  - /vraag-en-aanbod/
+
 # Zoektermen die op elke webshop worden ingevuld in {q}.
 search_terms:
   - "switch 2 zelda"
@@ -74,8 +80,6 @@ shops:
     search: https://www.nintendo.com/nl-nl/Zoeken/Zoeken-299117.html?q={q}
   - name: Intertoys
     search: https://www.intertoys.nl/search?q={q}
-  - name: Bart Smit
-    search: https://www.bartsmit.nl/search?q={q}
   - name: Game Mania
     search: https://www.gamemania.nl/search?q={q}
   - name: Nedgame
@@ -83,9 +87,9 @@ shops:
   - name: Wehkamp
     search: https://www.wehkamp.nl/zoeken/?term={q}
   - name: Blokker
-    search: https://www.blokker.nl/search?text={q}
+    search: https://www.blokker.nl/zoeken?q={q}
   - name: Expert
-    search: https://www.expert.nl/catalogsearch/result/?q={q}
+    search: https://www.expert.nl/zoeken?q={q}
   - name: EP
     search: https://www.ep.nl/zoeken/?q={q}
   - name: Alternate

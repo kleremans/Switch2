@@ -13,6 +13,10 @@ on:
         description: "Alleen een testmelding sturen"
         type: boolean
         default: false
+      debug:
+        description: "Extra debug-info tonen voor pagina's met onbekende status"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # state.json terugschrijven
@@ -73,6 +77,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ISSUE_ALERTS: ${{ vars.GITHUB_ISSUE_ALERTS || 'true' }}
+          DEBUG_UNKNOWN: ${{ inputs.debug && '1' || '' }}
         run: python monitor.py --verbose
 
       - name: Status opslaan
