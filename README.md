@@ -49,6 +49,14 @@ door de monitor zelf gevonden voorraad met prioriteit "urgent".
 - Bij de eerste run worden bestaande posts alleen onthouden, niet gemeld.
 - Maximaal 3 tips per run. Instellingen staan onder `social:` in `config.yaml`;
   uitzetten met `enabled: false`.
+- **Reddit en Bluesky** blokkeren anonieme verzoeken vanaf GitHub. Wil je ze
+  gebruiken, voeg dan (gratis) een sleutel toe als repository-secret:
+  - *Reddit*: maak op https://www.reddit.com/prefs/apps een app van het type
+    **script** (redirect-URI mag `http://localhost` zijn). Zet de code onder de
+    app-naam in `REDDIT_CLIENT_ID` en het "secret" in `REDDIT_CLIENT_SECRET`.
+  - *Bluesky*: maak in de app via Instellingen → Privacy en beveiliging →
+    App-wachtwoorden een app-wachtwoord. Zet je handle (bv. `naam.bsky.social`) in
+    `BLUESKY_HANDLE` en het app-wachtwoord in `BLUESKY_APP_PASSWORD`.
 - X/Twitter, Instagram, Facebook en TikTok kunnen niet: die vereisen een betaalde
   API of een ingelogd account.
 

@@ -12,6 +12,7 @@ met oude berichten.
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from datetime import datetime, timezone
@@ -82,9 +83,51 @@ def source_pepper(session, query: str) -> tuple[str, list[dict]]:
     return "200", list(posts.values())
 
 
+_TOKENS: dict[str, str] = {}
+
+
+def _reddit_token() -> str | None:
+    """OAuth-token via een (gratis) Reddit 'script'-app, als die is ingesteld."""
+    cid, secret = os.getenv("REDDIT_CLIENT_ID", "").strip(), os.getenv("REDDIT_CLIENT_SECRET", "").strip()
+    if not (cid and secret):
+        return None
+    if "reddit" not in _TOKENS:
+        import requests
+        r = requests.post("https://www.reddit.com/api/v1/access_token",
+                          auth=(cid, secret), data={"grant_type": "client_credentials"},
+                          headers={"User-Agent": "zelda-switch2-monitor/1.0"}, timeout=20)
+        r.raise_for_status()
+        _TOKENS["reddit"] = r.json()["access_token"]
+    return _TOKENS["reddit"]
+
+
+def _bluesky_token() -> str | None:
+    """Sessie via Bluesky-handle + app-wachtwoord, als die is ingesteld."""
+    handle, pw = os.getenv("BLUESKY_HANDLE", "").strip(), os.getenv("BLUESKY_APP_PASSWORD", "").strip()
+    if not (handle and pw):
+        return None
+    if "bluesky" not in _TOKENS:
+        import requests
+        r = requests.post("https://bsky.social/xrpc/com.atproto.server.createSession",
+                          json={"identifier": handle, "password": pw}, timeout=20)
+        r.raise_for_status()
+        _TOKENS["bluesky"] = r.json()["accessJwt"]
+    return _TOKENS["bluesky"]
+
+
+def _get_json_with_token(url: str, token: str, ua: str = "zelda-switch2-monitor/1.0") -> tuple[int, str]:
+    import requests
+    r = requests.get(url, headers={"Authorization": f"Bearer {token}", "User-Agent": ua}, timeout=25)
+    return r.status_code, r.text
+
+
 def source_reddit(session, query: str) -> tuple[str, list[dict]]:
-    url = f"https://www.reddit.com/search.json?q={quote_plus(query)}&sort=new&t=week&limit=50"
-    status, body = fetch(session, url)
+    params = f"q={quote_plus(query)}&sort=new&t=week&limit=50"
+    token = _reddit_token()
+    if token:
+        status, body = _get_json_with_token(f"https://oauth.reddit.com/search?{params}&raw_json=1", token)
+    else:
+        status, body = fetch(session, f"https://www.reddit.com/search.json?{params}")
     if status != 200:
         return f"HTTP {status}", []
     try:
@@ -105,9 +148,12 @@ def source_reddit(session, query: str) -> tuple[str, list[dict]]:
 
 
 def source_bluesky(session, query: str) -> tuple[str, list[dict]]:
-    url = ("https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts"
-           f"?q={quote(query)}&sort=latest&limit=50")
-    status, body = fetch(session, url)
+    params = f"q={quote(query)}&sort=latest&limit=50"
+    token = _bluesky_token()
+    if token:
+        status, body = _get_json_with_token(f"https://bsky.social/xrpc/app.bsky.feed.searchPosts?{params}", token)
+    else:
+        status, body = fetch(session, f"https://public.api.bsky.app/xrpc/app.bsky.feed.searchPosts?{params}")
     if status != 200:
         return f"HTTP {status}", []
     try:
@@ -175,6 +221,8 @@ def run(session, cfg: dict, state: dict, notify, log, verbose: bool) -> None:
                 seen.append(post["id"])
             time.sleep(1)
 
+        if key in ("reddit", "bluesky") and all("403" in st for st in statuses):
+            statuses = ["geblokkeerd (zie README: sleutel instellen)"]
         first_run = key not in initialized
         log(f"  {label:<12} {','.join(statuses):<16} {total} posts bekeken, {len(hits)} nieuwe relevante"
             + (" (eerste run: alleen onthouden)" if first_run and hits else ""))
