@@ -346,7 +346,8 @@ def debug_summary(soup: BeautifulSoup) -> str:
 # Meldingen
 # --------------------------------------------------------------------------- #
 
-def notify(title: str, message: str, click_url: str | None = None) -> list[str]:
+def notify(title: str, message: str, click_url: str | None = None,
+           priority: str = "urgent", issue: bool = True) -> list[str]:
     sent: list[str] = []
     import requests  # gewone requests volstaat voor meldingen
 
@@ -359,7 +360,7 @@ def notify(title: str, message: str, click_url: str | None = None) -> list[str]:
     topic = topic.strip("/ ")
     if topic:
         server = server.rstrip("/")
-        headers = {"Title": title.encode("utf-8"), "Priority": "urgent", "Tags": "rotating_light,video_game"}
+        headers = {"Title": title.encode("utf-8"), "Priority": priority, "Tags": "rotating_light,video_game"}
         if click_url:
             headers["Click"] = click_url
             headers["Actions"] = f"view, Open webshop, {click_url}"
@@ -384,7 +385,7 @@ def notify(title: str, message: str, click_url: str | None = None) -> list[str]:
             log(f"!! Telegram-melding mislukt: {e}")
 
     gh_token, repo = os.getenv("GITHUB_TOKEN", "").strip(), os.getenv("GITHUB_REPOSITORY", "").strip()
-    if gh_token and repo and os.getenv("GITHUB_ISSUE_ALERTS", "true").lower() == "true":
+    if issue and gh_token and repo and os.getenv("GITHUB_ISSUE_ALERTS", "true").lower() == "true":
         try:
             r = requests.post(
                 f"https://api.github.com/repos/{repo}/issues",
@@ -487,6 +488,11 @@ def run(verbose: bool) -> int:
         log(f"\n>>> MELDING: {title} -> {r.url}")
         sent = notify(title, msg, r.url)
         log(f"    verstuurd via: {', '.join(sent) or 'niets'}")
+
+    # 5. Sociale media (tips van andere mensen)
+    if (cfg.get("social") or {}).get("enabled"):
+        import social
+        social.run(session, cfg, state, notify, log, verbose)
 
     state["last_run"] = now
     save_state(state)

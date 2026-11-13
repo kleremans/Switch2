@@ -70,6 +70,29 @@ max_candidates_per_shop: 6
 product_urls:
   - https://www.coolblue.nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
 
+# Sociale media: tips van andere mensen ("weer op voorraad bij ...").
+# Een tip geeft een melding met prioriteit "hoog" (de webshop-melding is "urgent").
+social:
+  enabled: true
+  sources: [pepper, reddit, bluesky]
+  queries:
+    - "zelda switch 2"
+    - "switch 2 zelda voorraad"
+  max_age_hours: 48             # oudere posts negeren
+  max_notifications_per_run: 3  # niet meer dan 3 tips per run
+  # Post moet over de console gaan:
+  require_all: ["zelda"]
+  require_any:
+    - ["switch 2", "switch2", "switch-2"]
+    - ["voorraad", "restock", "in stock", "back in stock", "beschikbaar", "leverbaar",
+       "bestelbaar", "te koop", "weer", "nu bij", "drop", "deal", "aanbieding", "€"]
+  exclude: ["pro controller", "amiibo", "wtb", "gezocht", "ruilen"]
+  # Voor Reddit en Bluesky (wereldwijd) moet de post ook over Nederland gaan:
+  nl_words: [".nl", "coolblue", "bol.com", "bol ", "mediamarkt", "nedgame", "game mania",
+             "gamemania", "intertoys", "amazon.nl", "wehkamp", "alternate", "tweakers",
+             "nederland", "netherlands", "dutch", "holland", " nl ", "(nl)", "[nl]",
+             "r/thenetherlands", "r/nederland", "belgi"]
+
 # Nederlandse webshops met hun zoek-URL. {q} wordt vervangen door de zoekterm.
 # Zet "enabled: false" om een shop over te slaan.
 shops:

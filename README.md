@@ -36,6 +36,22 @@ Veel grote shops (bol.com, MediaMarkt, Amazon, Nedgame, Game Mania) blokkeren
 GitHub. Tweakers Pricewatch verzamelt de prijzen van al die winkels wél, dus als
 een van hen de console weer verkoopt, ziet de monitor dat via Tweakers.
 
+### Sociale media (tips van anderen)
+
+De monitor leest ook mee op **Pepper.com NL**, **Reddit** en **Bluesky**. Meldt
+iemand daar dat de Zelda Switch 2 ergens (in Nederland) op voorraad is, dan krijg
+je een melding "💬 Tip via …" met een link naar de post. Zulke tips zijn niet
+gecontroleerd, dus kijk zelf even. Ze komen met prioriteit "hoog" binnen; een
+door de monitor zelf gevonden voorraad met prioriteit "urgent".
+
+- Bij Reddit en Bluesky moet de post over Nederland gaan (een NL-shop of
+  "Nederland" noemen), anders krijg je ook alle Amerikaanse restocks.
+- Bij de eerste run worden bestaande posts alleen onthouden, niet gemeld.
+- Maximaal 3 tips per run. Instellingen staan onder `social:` in `config.yaml`;
+  uitzetten met `enabled: false`.
+- X/Twitter, Instagram, Facebook en TikTok kunnen niet: die vereisen een betaalde
+  API of een ingelogd account.
+
 ## Installatie (±5 minuten)
 
 ### 1. Meldingen op je telefoon (ntfy, gratis, geen account nodig)
