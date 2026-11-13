@@ -78,6 +78,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ISSUE_ALERTS: ${{ vars.GITHUB_ISSUE_ALERTS || 'true' }}
           DEBUG_UNKNOWN: ${{ inputs.debug && '1' || '' }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          BLUESKY_HANDLE: ${{ secrets.BLUESKY_HANDLE }}
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: python monitor.py --verbose
 
       - name: Status opslaan

@@ -1,6 +1,6 @@
 # Zelda Switch 2 voorraad-monitor 🗡️🛡️
 
-Doorzoekt 8x per dag Nederlandse webshops op de **Nintendo Switch 2 – The Legend of
+Doorzoekt 8x per dag webshops in Nederland, Duitsland en België op de **Nintendo Switch 2 – The Legend of
 Zelda 40th Anniversary Edition** en stuurt je direct een pushmelding op je telefoon
 zodra hij ergens op voorraad is.
 
@@ -20,9 +20,33 @@ Draait gratis op GitHub Actions, dus je computer hoeft niet aan te staan.
    De status wordt bijgehouden in `state.json`, zodat je niet elke run opnieuw
    dezelfde melding krijgt.
 
-Gecontroleerde shops: Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intertoys,
-Bart Smit, Game Mania, Nedgame, Wehkamp, Blokker, Expert, EP, Alternate, Dreamland en
-Tweakers Pricewatch. Plus vaste productpagina's onder `product_urls`.
+Gecontroleerde shops (volledige lijst en instellingen in `config.yaml`):
+
+- 🇳🇱 Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intertoys, Game Mania,
+  Nedgame, Wehkamp, EP, Alternate, Tweakers Pricewatch
+- 🇩🇪 Amazon.de, MediaMarkt.de, Saturn, Otto, Coolblue.de, Galaxus, Alternate.de,
+  Müller, Smyths Toys, GameStop, Geizhals (prijsvergelijker)
+- 🇧🇪 Coolblue.be, MediaMarkt.be, Amazon.com.be, Fnac, Vanden Borre, Krëfel,
+  Dreamland, Game Mania BE
+
+### Indicaties in elke melding
+
+- **Land** met vlag (🇳🇱/🇩🇪/🇧🇪) en of de shop **naar Nederland verzendt**
+  (ja / nee / onbekend, met toelichting zoals "afhalen in BE kan").
+- **Prijs incl. verzending**: bij buitenlandse shops die naar NL verzenden wordt
+  een indicatie van de verzendkosten (`shipping_nl` in `config.yaml`) opgeteld.
+  De prijsgrens geldt voor dat totaal.
+
+### Vroege signalen 👀
+
+Naast "op voorraad" (🚨, prioriteit urgent) krijg je een melding met prioriteit
+hoog als:
+
+- een shop meldt dat de console **binnenkort (weer) leverbaar** is
+  ("binnenkort beschikbaar", "demnächst verfügbar", "bientôt disponible", …);
+- er een **nieuwe productpagina** opduikt bij een shop die al gevolgd werd.
+
+Uitzetten: `early_signals: enabled: false` in `config.yaml`.
 
 ### Prijsgrens
 
@@ -35,6 +59,30 @@ aanbod staat in de log als "💸 te duur".
 Veel grote shops (bol.com, MediaMarkt, Amazon, Nedgame, Game Mania) blokkeren
 GitHub. Tweakers Pricewatch verzamelt de prijzen van al die winkels wél, dus als
 een van hen de console weer verkoopt, ziet de monitor dat via Tweakers.
+
+### Sociale media (tips van anderen)
+
+De monitor leest ook mee op **Pepper.com NL**, **Reddit** en **Bluesky**. Meldt
+iemand daar dat de Zelda Switch 2 ergens (in Nederland) op voorraad is, dan krijg
+je een melding "💬 Tip via …" met een link naar de post. Zulke tips zijn niet
+gecontroleerd, dus kijk zelf even. Ze komen met prioriteit "hoog" binnen; een
+door de monitor zelf gevonden voorraad met prioriteit "urgent".
+
+- Bij Reddit en Bluesky moet de post over Nederland gaan (een NL-shop of
+  "Nederland" noemen), anders krijg je ook alle Amerikaanse restocks.
+- Bij de eerste run worden bestaande posts alleen onthouden, niet gemeld.
+- Maximaal 3 tips per run. Instellingen staan onder `social:` in `config.yaml`;
+  uitzetten met `enabled: false`.
+- **Reddit en Bluesky** blokkeren anonieme verzoeken vanaf GitHub. Wil je ze
+  gebruiken, voeg dan (gratis) een sleutel toe als repository-secret:
+  - *Reddit*: maak op https://www.reddit.com/prefs/apps een app van het type
+    **script** (redirect-URI mag `http://localhost` zijn). Zet de code onder de
+    app-naam in `REDDIT_CLIENT_ID` en het "secret" in `REDDIT_CLIENT_SECRET`.
+  - *Bluesky*: maak in de app via Instellingen → Privacy en beveiliging →
+    App-wachtwoorden een app-wachtwoord. Zet je handle (bv. `naam.bsky.social`) in
+    `BLUESKY_HANDLE` en het app-wachtwoord in `BLUESKY_APP_PASSWORD`.
+- X/Twitter, Instagram, Facebook en TikTok kunnen niet: die vereisen een betaalde
+  API of een ingelogd account.
 
 ## Installatie (±5 minuten)
 
