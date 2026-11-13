@@ -24,6 +24,18 @@ Gecontroleerde shops: Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intert
 Bart Smit, Game Mania, Nedgame, Wehkamp, Blokker, Expert, EP, Alternate, Dreamland en
 Tweakers Pricewatch. Plus vaste productpagina's onder `product_urls`.
 
+### Prijsgrens
+
+Doorverkopers bieden de console vaak aan voor €750+. Je krijgt alleen een melding
+als de prijs **onder `max_price`** ligt (standaard €600, in `config.yaml`). Duurder
+aanbod staat in de log als "💸 te duur".
+
+### Tweakers Pricewatch
+
+Veel grote shops (bol.com, MediaMarkt, Amazon, Nedgame, Game Mania) blokkeren
+GitHub. Tweakers Pricewatch verzamelt de prijzen van al die winkels wél, dus als
+een van hen de console weer verkoopt, ziet de monitor dat via Tweakers.
+
 ## Installatie (±5 minuten)
 
 ### 1. Meldingen op je telefoon (ntfy, gratis, geen account nodig)

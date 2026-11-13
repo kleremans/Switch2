@@ -164,11 +164,14 @@ def find_candidates(html: str, base_url: str, cfg: dict) -> list[tuple[str, str]
     def consider(href: str, label: str) -> None:
         if not href or href.startswith(("javascript:", "mailto:", "#")):
             return
-        full = urljoin(base_url, href.replace("\\u002F", "/").replace("\\/", "/"))
+        href = href.replace("\\u002F", "/").replace("\\/", "/").rstrip("\\")
+        full = urljoin(base_url, href)
         host = urlparse(full).netloc.removeprefix("www.")
         if base_host not in host:
             return
         key = clean_url(full)
+        if any(part in key for part in cfg.get("exclude_url_parts") or []):
+            return
         text = f"{label} {urlparse(full).path.replace('-', ' ')} {urlparse(full).path}"
         if matches(text, cfg) and "zoeken" not in key and "search" not in key:
             if key not in found or len(label) > len(found[key]):
@@ -232,6 +235,15 @@ def parse_jsonld(soup: BeautifulSoup, cfg: dict) -> tuple[str | None, str, str]:
             title = title or name
             offers = node.get("offers") or []
             for offer in _walk(offers):
+                if "aggregateoffer" in _types(offer) and "availability" not in offer:
+                    try:
+                        count = int(offer.get("offerCount") or 0)
+                    except (TypeError, ValueError):
+                        count = 0
+                    statuses.append("instock" if count > 0 else "outofstock")
+                    if count > 0:
+                        price = price or str(offer.get("lowPrice") or "")
+                    continue
                 if "availability" in offer:
                     statuses.append(_avail_token(offer["availability"]))
                     price = price or str(offer.get("price") or offer.get("lowPrice") or "")
@@ -273,6 +285,18 @@ def parse_text(soup: BeautifulSoup) -> str:
     return "unknown"
 
 
+def apply_max_price(status: str, price: str, cfg: dict) -> str:
+    """Beschikbaar maar duurder dan max_price telt als 'te duur' (geen melding)."""
+    limit = cfg.get("max_price")
+    if status != "available" or not limit or not price:
+        return status
+    try:
+        value = float(str(price).replace("€", "").replace(",", ".").strip())
+    except ValueError:
+        return status
+    return "expensive" if value > float(limit) else status
+
+
 def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "") -> Result:
     res = Result(shop=shop, url=url, title=hint_title)
     status, html = fetch(session, url)
@@ -289,14 +313,33 @@ def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "")
     res.title = title or res.title
     res.price = price
     if st:
-        res.status, res.source = st, "jsonld"
+        res.status, res.source = apply_max_price(st, price, cfg), "jsonld"
         return res
     st = parse_meta(soup)
     if st:
         res.status, res.source = st, "meta"
         return res
+    if os.getenv("DEBUG_UNKNOWN"):
+        res.note = debug_summary(soup)
     res.status, res.source = parse_text(soup), "text"
     return res
+
+
+def debug_summary(soup: BeautifulSoup) -> str:
+    """Compacte samenvatting van een pagina zonder herkenbare voorraadinfo."""
+    parts = []
+    for script in soup.find_all("script", type=re.compile("ld\\+json", re.I)):
+        try:
+            data = json.loads(script.string or script.get_text() or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        for node in _walk(data):
+            if "offers" in node or {"offer", "aggregateoffer"} & _types(node):
+                parts.append("LD:" + json.dumps(node.get("offers", node), ensure_ascii=False)[:300])
+    text = normalize(soup.get_text(" "))
+    for m in list(re.finditer("€", text))[:5]:
+        parts.append("TXT:" + text[max(0, m.start() - 60): m.end() + 30])
+    return " | ".join(parts)[:1500]
 
 
 # --------------------------------------------------------------------------- #
@@ -307,9 +350,15 @@ def notify(title: str, message: str, click_url: str | None = None) -> list[str]:
     sent: list[str] = []
     import requests  # gewone requests volstaat voor meldingen
 
-    topic = os.getenv("NTFY_TOPIC", "").strip()
+    topic = (os.getenv("NTFY_TOPIC") or "").strip()
+    # Accepteer ook een volledige URL zoals "https://ntfy.sh/mijn-onderwerp"
+    if topic.startswith("http"):
+        server, _, topic = topic.rstrip("/").rpartition("/")
+    else:
+        server = (os.getenv("NTFY_SERVER") or "").strip() or "https://ntfy.sh"
+    topic = topic.strip("/ ")
     if topic:
-        server = os.getenv("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
+        server = server.rstrip("/")
         headers = {"Title": title.encode("utf-8"), "Priority": "urgent", "Tags": "rotating_light,video_game"}
         if click_url:
             headers["Click"] = click_url
@@ -408,7 +457,7 @@ def run(verbose: bool) -> int:
     log("")
     log("Productpagina's:")
     icon = {"available": "✅ BESCHIKBAAR", "unavailable": "❌ uitverkocht", "unknown": "❔ onbekend",
-            "error": "⚠️  fout"}
+            "expensive": "💸 te duur", "error": "⚠️  fout"}
     for r in results:
         extra = f" €{r.price}" if r.price else ""
         log(f"  {icon[r.status]:<16} [{r.shop}] {r.title[:60]}{extra} ({r.source} {r.note})".rstrip())
@@ -419,7 +468,7 @@ def run(verbose: bool) -> int:
     new_hits: list[Result] = []
     for r in results:
         prev = products.get(r.url, {})
-        if r.status in ("available", "unavailable"):
+        if r.status in ("available", "unavailable", "expensive"):
             if r.status == "available" and prev.get("status") != "available":
                 new_hits.append(r)
             products[r.url] = {
