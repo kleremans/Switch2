@@ -27,7 +27,7 @@ Tweakers Pricewatch. Plus vaste productpagina's onder `product_urls`.
 ### Prijsgrens
 
 Doorverkopers bieden de console vaak aan voor €750+. Je krijgt alleen een melding
-als de prijs **onder `max_price`** ligt (standaard €600, in `config.yaml`). Duurder
+als de prijs **onder `max_price`** ligt (standaard €650, in `config.yaml`). Duurder
 aanbod staat in de log als "💸 te duur".
 
 ### Tweakers Pricewatch

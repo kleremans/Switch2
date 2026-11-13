@@ -55,7 +55,7 @@ exclude_url_parts:
 # Maximale prijs in euro. Aanbod dat duurder is (doorverkopers/scalpers)
 # geeft GEEN melding maar wordt in de log als "te duur" getoond.
 # Adviesprijs is ca. €520-540. Zet op 0 om de grens uit te zetten.
-max_price: 600
+max_price: 650
 
 # Zoektermen die op elke webshop worden ingevuld in {q}.
 search_terms:
