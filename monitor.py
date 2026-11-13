@@ -350,9 +350,15 @@ def notify(title: str, message: str, click_url: str | None = None) -> list[str]:
     sent: list[str] = []
     import requests  # gewone requests volstaat voor meldingen
 
-    topic = os.getenv("NTFY_TOPIC", "").strip()
+    topic = (os.getenv("NTFY_TOPIC") or "").strip()
+    # Accepteer ook een volledige URL zoals "https://ntfy.sh/mijn-onderwerp"
+    if topic.startswith("http"):
+        server, _, topic = topic.rstrip("/").rpartition("/")
+    else:
+        server = (os.getenv("NTFY_SERVER") or "").strip() or "https://ntfy.sh"
+    topic = topic.strip("/ ")
     if topic:
-        server = os.getenv("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
+        server = server.rstrip("/")
         headers = {"Title": title.encode("utf-8"), "Priority": "urgent", "Tags": "rotating_light,video_game"}
         if click_url:
             headers["Click"] = click_url
