@@ -57,20 +57,49 @@ AVAILABLE_SCHEMA = {
 UNAVAILABLE_SCHEMA = {"outofstock", "soldout", "discontinued", "instoreonly"}
 
 # Tekst-heuristiek als er geen gestructureerde data is.
+# Vroege signalen: nog niet te koop, maar er komt (binnenkort) voorraad.
+COMING_PHRASES = [
+    # NL
+    "binnenkort beschikbaar", "binnenkort verkrijgbaar", "binnenkort weer", "verwacht binnenkort",
+    "verwacht op voorraad", "weer leverbaar vanaf", "weer op voorraad vanaf", "levering verwacht",
+    "verwachte leverdatum",
+    # DE
+    "demnächst verfügbar", "demnächst wieder", "bald wieder verfügbar", "bald verfügbar",
+    "wieder lieferbar ab", "wieder verfügbar ab", "voraussichtlich lieferbar ab",
+    # FR (BE)
+    "bientôt disponible", "bientôt de retour", "prochainement disponible", "réassort prévu",
+    # EN
+    "coming soon", "back soon", "expected in stock",
+]
 NEGATIVE_PHRASES = [
+    # NL
     "uitverkocht", "niet leverbaar", "niet op voorraad", "tijdelijk niet",
     "niet beschikbaar", "momenteel niet", "houd mij op de hoogte",
     "hou mij op de hoogte", "mail mij", "e-mail mij", "stuur mij een bericht",
-    "breng me op de hoogte", "binnenkort verkrijgbaar", "binnenkort beschikbaar",
-    "out of stock", "sold out", "currently unavailable", "niet meer leverbaar",
-    "notify me", "verwacht binnenkort",
+    "breng me op de hoogte", "niet meer leverbaar",
+    # DE
+    "ausverkauft", "nicht verfügbar", "nicht lieferbar", "derzeit nicht", "nicht vorrätig",
+    "nicht mehr verfügbar", "benachrichtigen sie mich", "benachrichtigung",
+    # FR
+    "épuisé", "rupture de stock", "indisponible", "pas disponible", "me prévenir", "m'avertir",
+    # EN
+    "out of stock", "sold out", "currently unavailable", "notify me",
 ]
 POSITIVE_PHRASES = [
+    # NL
     "in winkelwagen", "in mijn winkelwagen", "in winkelmand", "aan winkelwagen toevoegen",
     "toevoegen aan winkelwagen", "op voorraad", "direct leverbaar", "morgen in huis",
-    "morgen bezorgd", "vandaag besteld", "voor 23:59 besteld", "add to cart",
-    "add to basket", "nu bestellen", "bestel nu", "pre-order nu", "reserveer nu",
+    "morgen bezorgd", "vandaag besteld", "voor 23:59 besteld", "nu bestellen", "bestel nu",
+    "pre-order nu", "reserveer nu",
+    # DE
+    "in den warenkorb", "sofort lieferbar", "auf lager", "jetzt kaufen", "vorbestellen",
+    # FR
+    "ajouter au panier", "en stock", "commander maintenant", "précommander",
+    # EN
+    "add to cart", "add to basket", "buy now",
 ]
+
+COUNTRIES = {"NL": ("🇳🇱", "Nederland"), "DE": ("🇩🇪", "Duitsland"), "BE": ("🇧🇪", "België")}
 
 
 @dataclass
@@ -78,10 +107,45 @@ class Result:
     shop: str
     url: str
     title: str = ""
-    status: str = "unknown"  # available | unavailable | unknown | error
+    status: str = "unknown"  # available | coming | unavailable | expensive | unknown | error
     source: str = ""  # jsonld | meta | text | http
     price: str = ""
     note: str = ""
+    country: str = "NL"
+    ships_nl: bool | None = True  # verzendt naar NL? None = onbekend
+    shipping: float | None = None  # indicatie verzendkosten naar NL
+    shop_note: str = ""
+
+    @property
+    def flag(self) -> str:
+        return COUNTRIES.get(self.country, ("🌍", self.country))[0]
+
+    def price_value(self) -> float | None:
+        try:
+            return float(str(self.price).replace("€", "").replace(",", ".").strip())
+        except ValueError:
+            return None
+
+    def total(self) -> float | None:
+        """Prijs incl. (indicatie) verzending naar NL, als de shop naar NL verzendt."""
+        p = self.price_value()
+        if p is None:
+            return None
+        return p + (self.shipping or 0) if self.ships_nl else p
+
+    def price_text(self) -> str:
+        p = self.price_value()
+        if p is None:
+            return ""
+        if self.ships_nl and self.shipping:
+            return f"€{p:.2f} + ± €{self.shipping:.0f} verzending ≈ €{self.total():.2f}"
+        return f"€{p:.2f}"
+
+    def ships_text(self) -> str:
+        if self.country == "NL":
+            return "Nederlandse shop"
+        txt = {True: "verzendt naar NL", False: "verzendt NIET naar NL", None: "verzending naar NL onbekend"}
+        return txt[self.ships_nl] + (f" ({self.shop_note})" if self.shop_note else "")
 
 
 @dataclass
@@ -278,6 +342,8 @@ def parse_text(soup: BeautifulSoup) -> str:
     for tag in soup(["script", "style", "noscript", "template", "svg", "footer", "nav"]):
         tag.decompose()
     text = normalize(soup.get_text(" "))
+    if any(p in text for p in COMING_PHRASES):
+        return "coming"
     if any(p in text for p in NEGATIVE_PHRASES):
         return "unavailable"
     if any(p in text for p in POSITIVE_PHRASES):
@@ -285,20 +351,31 @@ def parse_text(soup: BeautifulSoup) -> str:
     return "unknown"
 
 
-def apply_max_price(status: str, price: str, cfg: dict) -> str:
-    """Beschikbaar maar duurder dan max_price telt als 'te duur' (geen melding)."""
+def apply_max_price(res: "Result", cfg: dict) -> str:
+    """Beschikbaar maar (incl. verzending) duurder dan max_price telt als 'te duur'."""
     limit = cfg.get("max_price")
-    if status != "available" or not limit or not price:
-        return status
-    try:
-        value = float(str(price).replace("€", "").replace(",", ".").strip())
-    except ValueError:
-        return status
-    return "expensive" if value > float(limit) else status
+    total = res.total()
+    if res.status != "available" or not limit or total is None:
+        return res.status
+    return "expensive" if total > float(limit) else res.status
 
 
-def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "") -> Result:
-    res = Result(shop=shop, url=url, title=hint_title)
+def shop_meta(shop: dict | None, url: str) -> dict:
+    """Land, verzending naar NL en verzendkosten van een shop."""
+    if shop is None:
+        tld = urlparse(url).netloc.rsplit(".", 1)[-1].upper()
+        country = tld if tld in COUNTRIES else "NL"
+        return {"name": urlparse(url).netloc.removeprefix("www."), "country": country,
+                "ships_to_nl": True if country == "NL" else None, "shipping_nl": None, "note": ""}
+    country = shop.get("country", "NL")
+    return {"name": shop["name"], "country": country,
+            "ships_to_nl": shop.get("ships_to_nl", True if country == "NL" else None),
+            "shipping_nl": shop.get("shipping_nl"), "note": shop.get("note", "")}
+
+
+def check_product(session, meta: dict, url: str, cfg: dict, hint_title: str = "") -> Result:
+    res = Result(shop=meta["name"], url=url, title=hint_title, country=meta["country"],
+                 ships_nl=meta["ships_to_nl"], shipping=meta["shipping_nl"], shop_note=meta["note"])
     status, html = fetch(session, url)
     if status != 200:
         res.status, res.source, res.note = "error", "http", f"HTTP {status}"
@@ -313,15 +390,21 @@ def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "")
     res.title = title or res.title
     res.price = price
     if st:
-        res.status, res.source = apply_max_price(st, price, cfg), "jsonld"
-        return res
-    st = parse_meta(soup)
-    if st:
-        res.status, res.source = st, "meta"
+        res.status, res.source = st, "jsonld"
+    else:
+        st = parse_meta(soup)
+        if st:
+            res.status, res.source = st, "meta"
+    if res.status != "unknown":
+        # Uitverkocht volgens de data, maar staat er "binnenkort weer leverbaar"? -> vroeg signaal
+        if res.status == "unavailable" and parse_text(soup) == "coming":
+            res.status = "coming"
+        res.status = apply_max_price(res, cfg)
         return res
     if os.getenv("DEBUG_UNKNOWN"):
         res.note = debug_summary(soup)
     res.status, res.source = parse_text(soup), "text"
+    res.status = apply_max_price(res, cfg)
     return res
 
 
@@ -414,16 +497,18 @@ def run(verbose: bool) -> int:
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     # 1. Verzamel kandidaten: vaste URLs + zoekresultaten per shop
-    candidates: dict[str, tuple[str, str]] = {}  # url -> (shop, titel)
+    candidates: dict[str, tuple[dict, str]] = {}  # url -> (shop-meta, titel)
+    shops_by_host = {urlparse(s["search"]).netloc.removeprefix("www."): s for s in cfg["shops"]}
     for url in cfg.get("product_urls") or []:
         host = urlparse(url).netloc.removeprefix("www.")
-        candidates[clean_url(url)] = (host, "")
+        candidates[clean_url(url)] = (shop_meta(shops_by_host.get(host), url), "")
 
     reports: list[ShopReport] = []
+    searched_ok: set[str] = set()  # shops waarvan de zoekpagina werkte
     for shop in cfg["shops"]:
         if shop.get("enabled") is False:
             continue
-        rep = ShopReport(shop["name"])
+        rep = ShopReport(f"{COUNTRIES.get(shop.get('country', 'NL'), ('', ''))[0]} {shop['name']}")
         per_shop: dict[str, str] = {}
         for term in cfg["search_terms"]:
             url = shop["search"].replace("{q}", quote_plus(term))
@@ -433,15 +518,17 @@ def run(verbose: bool) -> int:
                 for cu, title in find_candidates(html, url, cfg):
                     per_shop.setdefault(cu, title)
             time.sleep(random.uniform(0.5, 1.5))
+        if "200" in rep.search_status:
+            searched_ok.add(shop["name"])
         for cu, title in list(per_shop.items())[: cfg.get("max_candidates_per_shop", 6)]:
-            candidates.setdefault(cu, (shop["name"], title))
+            candidates.setdefault(cu, (shop_meta(shop, cu), title))
             rep.candidates.append(cu)
         reports.append(rep)
 
     # 2. Controleer elke productpagina
     results: list[Result] = []
-    for url, (shop, title) in candidates.items():
-        res = check_product(session, shop, url, cfg, title)
+    for url, (meta, title) in candidates.items():
+        res = check_product(session, meta, url, cfg, title)
         results.append(res)
         time.sleep(random.uniform(0.5, 1.5))
 
@@ -451,43 +538,68 @@ def run(verbose: bool) -> int:
     log("=" * 70)
     log("Zoekpagina's (HTTP-status per zoekterm / aantal kandidaten):")
     for rep in reports:
-        log(f"  {rep.shop:<22} {','.join(rep.search_status):<12} {len(rep.candidates)} kandidaat(en)")
+        log(f"  {rep.shop:<24} {','.join(rep.search_status):<12} {len(rep.candidates)} kandidaat(en)")
         if verbose:
             for c in rep.candidates:
                 log(f"      - {c}")
     log("")
     log("Productpagina's:")
-    icon = {"available": "✅ BESCHIKBAAR", "unavailable": "❌ uitverkocht", "unknown": "❔ onbekend",
-            "expensive": "💸 te duur", "error": "⚠️  fout"}
+    icon = {"available": "✅ BESCHIKBAAR", "coming": "👀 binnenkort", "unavailable": "❌ uitverkocht",
+            "unknown": "❔ onbekend", "expensive": "💸 te duur", "error": "⚠️  fout"}
     for r in results:
-        extra = f" €{r.price}" if r.price else ""
-        log(f"  {icon[r.status]:<16} [{r.shop}] {r.title[:60]}{extra} ({r.source} {r.note})".rstrip())
-        log(f"      {r.url}")
+        extra = f" {r.price_text()}" if r.price else ""
+        log(f"  {icon[r.status]:<16} {r.flag} [{r.shop}] {r.title[:55]}{extra} ({r.source} {r.note})".rstrip())
+        log(f"      {r.ships_text()} - {r.url}")
 
     # 4. Meldingen bij overgang naar beschikbaar
     products = state.setdefault("products", {})
+    # Een nieuwe productpagina is pas een signaal als we die shop al eerder bekeken
+    # (anders geeft elke nieuw toegevoegde shop een stortvloed aan meldingen).
+    known_shops = set(state.get("known_shops") or {p.get("shop") for p in products.values()})
     new_hits: list[Result] = []
+    signals: list[tuple[Result, str]] = []
     for r in results:
-        prev = products.get(r.url, {})
-        if r.status in ("available", "unavailable", "expensive"):
-            if r.status == "available" and prev.get("status") != "available":
-                new_hits.append(r)
+        prev = products.get(r.url)
+        prev_status = (prev or {}).get("status")
+        if r.status == "available" and prev_status != "available":
+            new_hits.append(r)
+        elif r.status == "coming" and prev_status not in ("coming", "available"):
+            signals.append((r, "De shop meldt dat de console binnenkort (weer) leverbaar is."))
+        elif prev is None and r.shop in known_shops and r.status not in ("error",):
+            signals.append((r, "Nieuwe productpagina gevonden - vaak een voorbode van (nieuwe) voorraad."))
+        if r.status in ("available", "coming", "unavailable", "expensive") or prev is None:
             products[r.url] = {
-                "shop": r.shop, "title": r.title, "status": r.status, "source": r.source,
-                "price": r.price, "last_change": now if prev.get("status") != r.status else prev.get("last_change", now),
+                "shop": r.shop, "country": r.country, "title": r.title, "status": r.status,
+                "source": r.source, "price": r.price,
+                "last_change": now if prev_status != r.status else (prev or {}).get("last_change", now),
             }
-        elif r.url not in products:
-            products[r.url] = {"shop": r.shop, "title": r.title, "status": r.status, "last_change": now}
+
+    state["known_shops"] = sorted(known_shops | searched_ok
+                                  | {r.shop for r in results if r.status != "error"})
+
+    def details(r: Result) -> str:
+        country = COUNTRIES.get(r.country, ("", r.country))[1]
+        lines = [r.title or "Nintendo Switch 2 Zelda 40th Anniversary Edition",
+                 f"Shop: {r.shop} {r.flag} {country} - {r.ships_text()}"]
+        if r.price:
+            lines.append(f"Prijs: {r.price_text()}")
+        return "\n".join(lines)
 
     for r in new_hits:
         certainty = "" if r.source in ("jsonld", "meta") else " (waarschijnlijk - controleer even)"
-        title = f"🚨 Zelda Switch 2 beschikbaar bij {r.shop}!"
-        msg = (f"{r.title or 'Nintendo Switch 2 Zelda 40th Anniversary Edition'}\n"
-               f"{'Prijs: €' + r.price + chr(10) if r.price else ''}"
-               f"Status: op voorraad{certainty}\n{r.url}")
+        title = f"🚨 {r.flag} Zelda Switch 2 beschikbaar bij {r.shop}!"
+        msg = f"{details(r)}\nStatus: op voorraad{certainty}\n{r.url}"
         log(f"\n>>> MELDING: {title} -> {r.url}")
         sent = notify(title, msg, r.url)
         log(f"    verstuurd via: {', '.join(sent) or 'niets'}")
+
+    if (cfg.get("early_signals") or {}).get("enabled", True):
+        for r, why in signals:
+            title = f"👀 {r.flag} Vroeg signaal: Zelda Switch 2 bij {r.shop}"
+            msg = f"{details(r)}\n{why}\n{r.url}"
+            log(f"\n>>> VROEG SIGNAAL: {title} -> {r.url}")
+            sent = notify(title, msg, r.url, priority="high", issue=False)
+            log(f"    verstuurd via: {', '.join(sent) or 'niets'}")
 
     # 5. Sociale media (tips van andere mensen)
     if (cfg.get("social") or {}).get("enabled"):

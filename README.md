@@ -1,6 +1,6 @@
 # Zelda Switch 2 voorraad-monitor 🗡️🛡️
 
-Doorzoekt 8x per dag Nederlandse webshops op de **Nintendo Switch 2 – The Legend of
+Doorzoekt 8x per dag webshops in Nederland, Duitsland en België op de **Nintendo Switch 2 – The Legend of
 Zelda 40th Anniversary Edition** en stuurt je direct een pushmelding op je telefoon
 zodra hij ergens op voorraad is.
 
@@ -20,9 +20,33 @@ Draait gratis op GitHub Actions, dus je computer hoeft niet aan te staan.
    De status wordt bijgehouden in `state.json`, zodat je niet elke run opnieuw
    dezelfde melding krijgt.
 
-Gecontroleerde shops: Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intertoys,
-Bart Smit, Game Mania, Nedgame, Wehkamp, Blokker, Expert, EP, Alternate, Dreamland en
-Tweakers Pricewatch. Plus vaste productpagina's onder `product_urls`.
+Gecontroleerde shops (volledige lijst en instellingen in `config.yaml`):
+
+- 🇳🇱 Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intertoys, Game Mania,
+  Nedgame, Wehkamp, EP, Alternate, Tweakers Pricewatch
+- 🇩🇪 Amazon.de, MediaMarkt.de, Saturn, Otto, Coolblue.de, Galaxus, Alternate.de,
+  Müller, Smyths Toys, GameStop, Geizhals (prijsvergelijker)
+- 🇧🇪 Coolblue.be, MediaMarkt.be, Amazon.com.be, Fnac, Vanden Borre, Krëfel,
+  Dreamland, Game Mania BE
+
+### Indicaties in elke melding
+
+- **Land** met vlag (🇳🇱/🇩🇪/🇧🇪) en of de shop **naar Nederland verzendt**
+  (ja / nee / onbekend, met toelichting zoals "afhalen in BE kan").
+- **Prijs incl. verzending**: bij buitenlandse shops die naar NL verzenden wordt
+  een indicatie van de verzendkosten (`shipping_nl` in `config.yaml`) opgeteld.
+  De prijsgrens geldt voor dat totaal.
+
+### Vroege signalen 👀
+
+Naast "op voorraad" (🚨, prioriteit urgent) krijg je een melding met prioriteit
+hoog als:
+
+- een shop meldt dat de console **binnenkort (weer) leverbaar** is
+  ("binnenkort beschikbaar", "demnächst verfügbar", "bientôt disponible", …);
+- er een **nieuwe productpagina** opduikt bij een shop die al gevolgd werd.
+
+Uitzetten: `early_signals: enabled: false` in `config.yaml`.
 
 ### Prijsgrens
 

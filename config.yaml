@@ -9,7 +9,9 @@ match:
   require_all: ["zelda"]
   require_any:
     - ["switch 2", "switch-2", "switch2", "switch_2"]
-    - ["40th", "anniversary", "40-jarig", "40 jarig", "jubileum", "40e", "40ste", "jubilaeum"]
+    - ["40th", "anniversary", "40-jarig", "40 jarig", "jubileum", "40e", "40ste",
+       "jubilaeum", "jubiläum", "40. jubil", "40-jahre", "40 jahre",
+       "anniversaire", "40e anniv", "40ème"]
   exclude:
     - controller
     - amiibo
@@ -43,6 +45,18 @@ match:
     - soundtrack
     - vinyl
     - tweedehands
+    # Duits
+    - tasche
+    - hülle
+    - huelle
+    - schutzfolie
+    - gebraucht
+    # Frans
+    - manette
+    - housse
+    - sacoche
+    - étui
+    - occasion
     - refurbished
     - gebruikt
 
@@ -69,6 +83,14 @@ max_candidates_per_shop: 6
 # zodra je een productpagina vindt).
 product_urls:
   - https://www.coolblue.nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
+  - https://www.coolblue.be/nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
+  - https://www.coolblue.de/produkt/986118/nintendo-switch-2-the-legend-of-zelda-edition-zum-40-jubilaeum.html
+
+# Vroege signalen (melding met prioriteit "hoog"):
+#  - een shop meldt "binnenkort weer leverbaar" / "demnächst verfügbar" e.d.
+#  - er duikt een nieuwe productpagina op bij een shop die we al volgden
+early_signals:
+  enabled: true
 
 # Sociale media: tips van andere mensen ("weer op voorraad bij ...").
 # Een tip geeft een melding met prioriteit "hoog" (de webshop-melding is "urgent").
@@ -93,9 +115,15 @@ social:
              "nederland", "netherlands", "dutch", "holland", " nl ", "(nl)", "[nl]",
              "r/thenetherlands", "r/nederland", "belgi"]
 
-# Nederlandse webshops met hun zoek-URL. {q} wordt vervangen door de zoekterm.
+# Webshops met hun zoek-URL. {q} wordt vervangen door de zoekterm.
+#   country      : NL / DE / BE (vlag in log en melding)
+#   ships_to_nl  : true / false / null (= onbekend) - verzendt de shop naar NL?
+#   shipping_nl  : indicatie verzendkosten naar NL in euro (opgeteld bij de prijs
+#                  voor de prijsgrens)
+#   note         : extra toelichting in de melding
 # Zet "enabled: false" om een shop over te slaan.
 shops:
+  # ---------------------------------------------------------------- Nederland
   - name: Coolblue
     search: https://www.coolblue.nl/zoeken?query={q}
   - name: bol.com
@@ -124,7 +152,102 @@ shops:
     search: https://www.ep.nl/zoeken/?q={q}
   - name: Alternate
     search: https://www.alternate.nl/listing.xhtml?q={q}
-  - name: Dreamland
-    search: https://www.dreamland.be/nl/search?q={q}
   - name: Tweakers Pricewatch
     search: https://tweakers.net/zoeken/?keyword={q}
+
+  # ---------------------------------------------------------------- Duitsland
+  - name: Amazon.de
+    country: DE
+    ships_to_nl: true
+    shipping_nl: 7
+    note: "Amazon.de levert meestal naar NL; controleer bij de verkoper"
+    search: https://www.amazon.de/s?k={q}
+  - name: MediaMarkt.de
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.mediamarkt.de/de/search.html?query={q}
+  - name: Saturn.de
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.saturn.de/de/search.html?query={q}
+  - name: Otto.de
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.otto.de/suche/{q}/
+  - name: Coolblue.de
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.coolblue.de/suche?query={q}
+  - name: Galaxus.de
+    country: DE
+    ships_to_nl: null
+    search: https://www.galaxus.de/de/search?q={q}
+  - name: Alternate.de
+    country: DE
+    ships_to_nl: false
+    note: "NL-klanten via alternate.nl"
+    search: https://www.alternate.de/listing.xhtml?q={q}
+  - name: Müller
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.mueller.de/search/?q={q}
+  - name: Smyths Toys DE
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.smythstoys.com/de/de-de/search?text={q}
+  - name: GameStop.de
+    country: DE
+    ships_to_nl: false
+    note: "alleen Duits adres"
+    search: https://www.gamestop.de/SearchResult/QuickSearch?q={q}
+  - name: Geizhals.de
+    country: DE
+    ships_to_nl: null
+    note: "prijsvergelijker; verzending verschilt per shop"
+    search: https://geizhals.de/?fs={q}
+
+  # ---------------------------------------------------------------- België
+  - name: Coolblue.be
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres; afhalen in een Belgische winkel kan"
+    search: https://www.coolblue.be/nl/zoeken?query={q}
+  - name: MediaMarkt.be
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres; afhalen in BE kan"
+    search: https://www.mediamarkt.be/nl/search.html?query={q}
+  - name: Amazon.com.be
+    country: BE
+    ships_to_nl: null
+    search: https://www.amazon.com.be/s?k={q}
+  - name: Fnac.be
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres"
+    search: https://www.fnac.be/SearchResult/ResultList.aspx?Search={q}
+  - name: Vanden Borre
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres; afhalen in BE kan"
+    search: https://www.vandenborre.be/nl/zoeken?q={q}
+  - name: Krëfel
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres"
+    search: https://www.krefel.be/nl/zoeken?q={q}
+  - name: Dreamland
+    country: BE
+    ships_to_nl: null
+    search: https://www.dreamland.be/nl/search?q={q}
+  - name: Game Mania BE
+    country: BE
+    ships_to_nl: false
+    note: "alleen Belgisch adres"
+    search: https://www.gamemania.be/nl/search?q={q}
