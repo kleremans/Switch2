@@ -1,0 +1,96 @@
+# Configuratie voor de Zelda Switch 2 voorraad-monitor.
+#
+# Product-matching gebeurt op de titel/URL van een product (kleine letters).
+# Een product telt mee als het:
+#   - ALLE woorden uit "require_all" bevat,
+#   - minstens één uit ELKE groep in "require_any" bevat,
+#   - GEEN enkel woord uit "exclude" bevat.
+match:
+  require_all: ["zelda"]
+  require_any:
+    - ["switch 2", "switch-2", "switch2", "switch_2"]
+    - ["40th", "anniversary", "40-jarig", "40 jarig", "jubileum", "40e", "40ste", "jubilaeum"]
+  exclude:
+    - controller
+    - amiibo
+    - " tas"
+    - "-tas"
+    - draagtas
+    - opbergtas
+    - carrying
+    - case
+    - hoes
+    - cover
+    - protector
+    - screenprotector
+    - beschermer
+    - joy-con
+    - joycon
+    - grip
+    - lader
+    - charging
+    - standaard
+    - poster
+    - t-shirt
+    - shirt
+    - hoodie
+    - mok
+    - figuur
+    - figure
+    - lego
+    - boek
+    - guide
+    - soundtrack
+    - vinyl
+    - tweedehands
+    - refurbished
+    - gebruikt
+
+# Zoektermen die op elke webshop worden ingevuld in {q}.
+search_terms:
+  - "switch 2 zelda"
+  - "zelda 40th anniversary"
+
+# Hoeveel kandidaat-productpagina's per webshop maximaal bekeken worden.
+max_candidates_per_shop: 6
+
+# Directe productpagina's die altijd gecontroleerd worden (voeg gerust toe
+# zodra je een productpagina vindt).
+product_urls:
+  - https://www.coolblue.nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
+
+# Nederlandse webshops met hun zoek-URL. {q} wordt vervangen door de zoekterm.
+# Zet "enabled: false" om een shop over te slaan.
+shops:
+  - name: Coolblue
+    search: https://www.coolblue.nl/zoeken?query={q}
+  - name: bol.com
+    search: https://www.bol.com/nl/nl/s/?searchtext={q}
+  - name: MediaMarkt
+    search: https://www.mediamarkt.nl/nl/search.html?query={q}
+  - name: Amazon.nl
+    search: https://www.amazon.nl/s?k={q}
+  - name: Nintendo Store
+    search: https://www.nintendo.com/nl-nl/Zoeken/Zoeken-299117.html?q={q}
+  - name: Intertoys
+    search: https://www.intertoys.nl/search?q={q}
+  - name: Bart Smit
+    search: https://www.bartsmit.nl/search?q={q}
+  - name: Game Mania
+    search: https://www.gamemania.nl/search?q={q}
+  - name: Nedgame
+    search: https://www.nedgame.nl/zoeken/?zoek={q}
+  - name: Wehkamp
+    search: https://www.wehkamp.nl/zoeken/?term={q}
+  - name: Blokker
+    search: https://www.blokker.nl/search?text={q}
+  - name: Expert
+    search: https://www.expert.nl/catalogsearch/result/?q={q}
+  - name: EP
+    search: https://www.ep.nl/zoeken/?q={q}
+  - name: Alternate
+    search: https://www.alternate.nl/listing.xhtml?q={q}
+  - name: Dreamland
+    search: https://www.dreamland.be/nl/search?q={q}
+  - name: Tweakers Pricewatch
+    search: https://tweakers.net/zoeken/?keyword={q}

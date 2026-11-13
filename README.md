@@ -1,1 +1,94 @@
-# Switch2
+# Zelda Switch 2 voorraad-monitor 🗡️🛡️
+
+Doorzoekt 8x per dag Nederlandse webshops op de **Nintendo Switch 2 – The Legend of
+Zelda 40th Anniversary Edition** en stuurt je direct een pushmelding op je telefoon
+zodra hij ergens op voorraad is.
+
+Draait gratis op GitHub Actions, dus je computer hoeft niet aan te staan.
+
+## Hoe werkt het?
+
+1. Op elke webshop in `config.yaml` wordt gezocht op "switch 2 zelda" en
+   "zelda 40th anniversary".
+2. Links in de zoekresultaten die op de console lijken worden verzameld.
+   Controllers, tassen, hoesjes, games (zoals *Breath of the Wild – Switch 2 Edition*)
+   e.d. worden eruit gefilterd.
+3. Elke gevonden productpagina wordt gecontroleerd op voorraad, eerst via de
+   gestructureerde productgegevens (schema.org `InStock`/`OutOfStock`) en anders via
+   teksten als "uitverkocht" of "in winkelwagen".
+4. Gaat een product van *uitverkocht* naar *beschikbaar*, dan krijg je een melding.
+   De status wordt bijgehouden in `state.json`, zodat je niet elke run opnieuw
+   dezelfde melding krijgt.
+
+Gecontroleerde shops: Coolblue, bol.com, MediaMarkt, Amazon.nl, Nintendo, Intertoys,
+Bart Smit, Game Mania, Nedgame, Wehkamp, Blokker, Expert, EP, Alternate, Dreamland en
+Tweakers Pricewatch. Plus vaste productpagina's onder `product_urls`.
+
+## Installatie (±5 minuten)
+
+### 1. Meldingen op je telefoon (ntfy, gratis, geen account nodig)
+
+1. Installeer de app **ntfy** ([Android](https://play.google.com/store/apps/details?id=io.heckel.ntfy) /
+   [iPhone](https://apps.apple.com/app/ntfy/id1625396347)).
+2. Verzin een lange, unieke onderwerpnaam, bijvoorbeeld `zelda-switch2-k8f3q9x2m`.
+   (Iedereen die de naam kent kan meelezen, dus maak hem niet te raden.)
+3. Tik in de app op **+** en abonneer je op die naam.
+4. Ga in GitHub naar **Settings → Secrets and variables → Actions → New repository secret**
+   en maak het secret `NTFY_TOPIC` aan met die naam als waarde.
+
+*Optioneel: Telegram.* Maak een bot via @BotFather en voeg de secrets
+`TELEGRAM_BOT_TOKEN` en `TELEGRAM_CHAT_ID` toe.
+
+*Extra vangnet:* bij een treffer wordt ook een GitHub-issue aangemaakt, waarvan je
+een mail of GitHub-app-melding krijgt. Uitzetten: maak de repository-variabele
+`GITHUB_ISSUE_ALERTS` met waarde `false`.
+
+### 2. Activeren
+
+Geplande GitHub Actions draaien **alleen vanaf de standaardbranch** (`main`).
+Zorg dat deze bestanden op `main` staan (merge de branch).
+
+### 3. Testen
+
+Ga naar **Actions → Zelda Switch 2 monitor → Run workflow**:
+
+- vink **Alleen een testmelding sturen** aan → je telefoon moet afgaan;
+- run nog eens zonder vinkje → in de log zie je per shop of de zoekpagina bereikbaar
+  was (HTTP 200) en welke productpagina's zijn gevonden.
+
+## Tijden
+
+8x per dag tussen 07:00 en 23:00 Nederlandse tijd: **08:17, 10:17, 12:17, 14:17,
+16:17, 18:17, 20:17 en 22:17**, het hele jaar door (zomer- en wintertijd worden
+automatisch goed gezet).
+
+Hoe: GitHub rekent alleen in UTC, dus de workflow start elk uur tussen 06 en 21 UTC
+en de eerste stap ("Tijdvenster") laat alleen de bovenstaande Nederlandse uren door.
+De overige starts stoppen meteen. Andere uren nodig? Pas de lijst
+`08|10|12|...` in `.github/workflows/monitor.yml` aan.
+
+> 💡 Restocks zijn vaak binnen minuten weer uitverkocht. Hoe vaker je controleert,
+> hoe groter de kans dat je op tijd bent. Voor een publieke repository zijn Actions
+> gratis; bij een privé-repository heb je 2000 gratis minuten per maand, en dit
+> schema gebruikt er ongeveer 750–1000.
+
+## Bekende beperkingen
+
+- Sommige grote shops (o.a. bol.com, Amazon, MediaMarkt) blokkeren soms verzoeken
+  vanaf servers van GitHub. Je ziet dat in de log als HTTP 403/503. De tool gebruikt
+  `curl_cffi` om zich als een gewone Chrome-browser voor te doen, wat veel helpt maar
+  niet altijd. Shops die je toch niet kan bereiken, kun je uitzetten met
+  `enabled: false`.
+- Vind je zelf een productpagina van de Zelda-editie, zet hem dan onder
+  `product_urls` in `config.yaml`. Die worden altijd gecontroleerd, ook als de
+  zoekfunctie van de shop niet meewerkt.
+- GitHub zet geplande workflows uit na 60 dagen zonder activiteit in de repository.
+  Omdat de monitor elke run `state.json` bijwerkt, blijft hij actief.
+
+## Lokaal draaien
+
+```bash
+pip install -r requirements.txt
+NTFY_TOPIC=jouw-onderwerp python monitor.py --test-notify
+python monitor.py --verbose
+```
