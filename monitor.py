@@ -143,7 +143,7 @@ class Result:
 
     def ships_text(self) -> str:
         if self.country == "NL":
-            return "Nederlandse shop"
+            return "Nederlandse shop" + (f" ({self.shop_note})" if self.shop_note else "")
         txt = {True: "verzendt naar NL", False: "verzendt NIET naar NL", None: "verzending naar NL onbekend"}
         return txt[self.ships_nl] + (f" ({self.shop_note})" if self.shop_note else "")
 

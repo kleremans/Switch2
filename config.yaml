@@ -153,6 +153,7 @@ shops:
   - name: Alternate
     search: https://www.alternate.nl/listing.xhtml?q={q}
   - name: Tweakers Pricewatch
+    note: "prijsvergelijker; klik door naar de goedkoopste shop"
     search: https://tweakers.net/zoeken/?keyword={q}
 
   # ---------------------------------------------------------------- Duitsland
@@ -173,11 +174,13 @@ shops:
     note: "alleen Duits adres"
     search: https://www.saturn.de/de/search.html?query={q}
   - name: Otto.de
+    enabled: false  # zoekpagina gaf 400
     country: DE
     ships_to_nl: false
     note: "alleen Duits adres"
     search: https://www.otto.de/suche/{q}/
   - name: Coolblue.de
+    enabled: false  # zoekpagina gaf 404; productpagina staat onder product_urls
     country: DE
     ships_to_nl: false
     note: "alleen Duits adres"
@@ -233,6 +236,7 @@ shops:
     note: "alleen Belgisch adres"
     search: https://www.fnac.be/SearchResult/ResultList.aspx?Search={q}
   - name: Vanden Borre
+    enabled: false  # zoekpagina gaf 404
     country: BE
     ships_to_nl: false
     note: "alleen Belgisch adres; afhalen in BE kan"
@@ -247,6 +251,7 @@ shops:
     ships_to_nl: null
     search: https://www.dreamland.be/nl/search?q={q}
   - name: Game Mania BE
+    enabled: false  # zoekpagina gaf 404
     country: BE
     ships_to_nl: false
     note: "alleen Belgisch adres"
