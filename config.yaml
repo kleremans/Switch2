@@ -52,6 +52,11 @@ exclude_url_parts:
   - /aanbod/
   - /vraag-en-aanbod/
 
+# Maximale prijs in euro. Aanbod dat duurder is (doorverkopers/scalpers)
+# geeft GEEN melding maar wordt in de log als "te duur" getoond.
+# Adviesprijs is ca. €520-540. Zet op 0 om de grens uit te zetten.
+max_price: 600
+
 # Zoektermen die op elke webshop worden ingevuld in {q}.
 search_terms:
   - "switch 2 zelda"
@@ -87,8 +92,10 @@ shops:
   - name: Wehkamp
     search: https://www.wehkamp.nl/zoeken/?term={q}
   - name: Blokker
+    enabled: false  # zoekpagina gaf 404
     search: https://www.blokker.nl/zoeken?q={q}
   - name: Expert
+    enabled: false  # zoekpagina gaf 404
     search: https://www.expert.nl/zoeken?q={q}
   - name: EP
     search: https://www.ep.nl/zoeken/?q={q}

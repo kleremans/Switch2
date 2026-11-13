@@ -235,6 +235,15 @@ def parse_jsonld(soup: BeautifulSoup, cfg: dict) -> tuple[str | None, str, str]:
             title = title or name
             offers = node.get("offers") or []
             for offer in _walk(offers):
+                if "aggregateoffer" in _types(offer) and "availability" not in offer:
+                    try:
+                        count = int(offer.get("offerCount") or 0)
+                    except (TypeError, ValueError):
+                        count = 0
+                    statuses.append("instock" if count > 0 else "outofstock")
+                    if count > 0:
+                        price = price or str(offer.get("lowPrice") or "")
+                    continue
                 if "availability" in offer:
                     statuses.append(_avail_token(offer["availability"]))
                     price = price or str(offer.get("price") or offer.get("lowPrice") or "")
@@ -276,6 +285,18 @@ def parse_text(soup: BeautifulSoup) -> str:
     return "unknown"
 
 
+def apply_max_price(status: str, price: str, cfg: dict) -> str:
+    """Beschikbaar maar duurder dan max_price telt als 'te duur' (geen melding)."""
+    limit = cfg.get("max_price")
+    if status != "available" or not limit or not price:
+        return status
+    try:
+        value = float(str(price).replace("€", "").replace(",", ".").strip())
+    except ValueError:
+        return status
+    return "expensive" if value > float(limit) else status
+
+
 def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "") -> Result:
     res = Result(shop=shop, url=url, title=hint_title)
     status, html = fetch(session, url)
@@ -292,7 +313,7 @@ def check_product(session, shop: str, url: str, cfg: dict, hint_title: str = "")
     res.title = title or res.title
     res.price = price
     if st:
-        res.status, res.source = st, "jsonld"
+        res.status, res.source = apply_max_price(st, price, cfg), "jsonld"
         return res
     st = parse_meta(soup)
     if st:
@@ -430,7 +451,7 @@ def run(verbose: bool) -> int:
     log("")
     log("Productpagina's:")
     icon = {"available": "✅ BESCHIKBAAR", "unavailable": "❌ uitverkocht", "unknown": "❔ onbekend",
-            "error": "⚠️  fout"}
+            "expensive": "💸 te duur", "error": "⚠️  fout"}
     for r in results:
         extra = f" €{r.price}" if r.price else ""
         log(f"  {icon[r.status]:<16} [{r.shop}] {r.title[:60]}{extra} ({r.source} {r.note})".rstrip())
@@ -441,7 +462,7 @@ def run(verbose: bool) -> int:
     new_hits: list[Result] = []
     for r in results:
         prev = products.get(r.url, {})
-        if r.status in ("available", "unavailable"):
+        if r.status in ("available", "unavailable", "expensive"):
             if r.status == "available" and prev.get("status") != "available":
                 new_hits.append(r)
             products[r.url] = {
