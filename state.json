@@ -3,6 +3,7 @@
     "Alternate",
     "Alternate.de",
     "Amazon.com.be",
+    "Amazon.de",
     "Amazon.nl",
     "Coolblue",
     "Coolblue.be",
@@ -17,7 +18,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-14T09:53:10+00:00",
+  "last_run": "2026-11-14T11:47:27+00:00",
   "products": {
     "https://tweakers.net/aanbod/4247134/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "last_change": "2026-11-13T18:38:04+00:00",
@@ -116,7 +117,8 @@
       "426915",
       "426847",
       "426958",
-      "426944"
+      "426944",
+      "426957"
     ],
     "reddit": []
   }
