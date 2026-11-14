@@ -9,6 +9,7 @@
     "Coolblue.de",
     "EP",
     "Galaxus.de",
+    "Game Mania",
     "Intertoys",
     "Krëfel",
     "Nintendo Store",
@@ -16,7 +17,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-13T21:54:12+00:00",
+  "last_run": "2026-11-14T07:08:19+00:00",
   "products": {
     "https://tweakers.net/aanbod/4247134/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "last_change": "2026-11-13T18:38:04+00:00",
@@ -112,7 +113,8 @@
       "426769",
       "425518",
       "426826",
-      "426915"
+      "426915",
+      "426847"
     ],
     "reddit": []
   }
