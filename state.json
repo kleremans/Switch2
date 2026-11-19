@@ -20,7 +20,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-18T21:58:06+00:00",
+  "last_run": "2026-11-19T07:26:40+00:00",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -70,7 +70,7 @@
     "https://tweakers.net/pricewatch/2386056/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "NL",
       "last_change": "2026-11-13T18:43:19+00:00",
-      "price": "786",
+      "price": "799.99",
       "shop": "Tweakers Pricewatch",
       "source": "jsonld",
       "status": "expensive",
