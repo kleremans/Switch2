@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-22T19:55:43+00:00",
+  "last_run": "2026-11-22T21:33:06+00:00",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -88,6 +88,15 @@
       "status": "unavailable",
       "title": "Nintendo Switch 2 The Legend of Zelda 40th Anniversary Edition"
     },
+    "https://www.coolblue.be/nl/product/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html": {
+      "country": "BE",
+      "last_change": "2026-11-22T21:33:06+00:00",
+      "price": "549",
+      "shop": "Coolblue.be",
+      "source": "jsonld",
+      "status": "available",
+      "title": "Nintendo Switch 2 (2026) + The Legend of Zelda: Ocarina of Time"
+    },
     "https://www.coolblue.de/produkt/986118/nintendo-switch-2-the-legend-of-zelda-edition-zum-40-jubilaeum.html": {
       "country": "DE",
       "last_change": "2026-11-13T19:10:07+00:00",
@@ -111,6 +120,15 @@
       "shop": "Coolblue",
       "status": "error",
       "title": ""
+    },
+    "https://www.coolblue.nl/product/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html": {
+      "country": "NL",
+      "last_change": "2026-11-22T21:33:06+00:00",
+      "price": "549",
+      "shop": "Coolblue",
+      "source": "jsonld",
+      "status": "available",
+      "title": "Nintendo Switch 2 (2026) + The Legend of Zelda: Ocarina of Time"
     }
   },
   "social_initialized": [
