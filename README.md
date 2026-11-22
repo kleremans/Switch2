@@ -1,7 +1,7 @@
 # Zelda Switch 2 voorraad-monitor 🗡️🛡️
 
 Doorzoekt 8x per dag webshops in Nederland, Duitsland en België op de **Nintendo Switch 2 – The Legend of
-Zelda 40th Anniversary Edition** en stuurt je direct een pushmelding op je telefoon
+Zelda 40th Anniversary Edition** (en de **Ocarina of Time Limited Edition**) en stuurt je direct een pushmelding op je telefoon
 zodra hij ergens op voorraad is.
 
 Draait gratis op GitHub Actions, dus je computer hoeft niet aan te staan.
@@ -47,6 +47,12 @@ hoog als:
 - er een **nieuwe productpagina** opduikt bij een shop die al gevolgd werd.
 
 Uitzetten: `early_signals: enabled: false` in `config.yaml`.
+
+### Andere edities volgen
+
+Onder `match: variants:` in `config.yaml` staan extra edities, zoals de Ocarina of
+Time Limited Edition. Elke variant heeft eigen verplichte woorden; een
+"console-woord" voorkomt dat de gelijknamige game meetelt.
 
 ### Prijsgrens
 
