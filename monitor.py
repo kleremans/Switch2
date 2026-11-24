@@ -62,12 +62,15 @@ COMING_PHRASES = [
     # NL
     "binnenkort beschikbaar", "binnenkort verkrijgbaar", "binnenkort weer", "verwacht binnenkort",
     "verwacht op voorraad", "weer leverbaar vanaf", "weer op voorraad vanaf", "levering verwacht",
-    "verwachte leverdatum",
+    "verwachte leverdatum", "binnenkort leverbaar", "binnenkort op voorraad",
+    "binnenkort te bestellen", "binnenkort bestelbaar", "binnenkort weer leverbaar",
+    "verwacht leverbaar", "spoedig leverbaar", "nieuwe voorraad verwacht",
     # DE
     "demnächst verfügbar", "demnächst wieder", "bald wieder verfügbar", "bald verfügbar",
+    "bald lieferbar", "demnächst lieferbar", "bald wieder lieferbar",
     "wieder lieferbar ab", "wieder verfügbar ab", "voraussichtlich lieferbar ab",
     # FR (BE)
-    "bientôt disponible", "bientôt de retour", "prochainement disponible", "réassort prévu",
+    "bientôt disponible", "bientôt de retour", "bientôt en stock", "prochainement disponible", "réassort prévu",
     # EN
     "coming soon", "back soon", "expected in stock",
 ]
@@ -187,15 +190,20 @@ def normalize(text: str) -> str:
     return re.sub(r"\s+", " ", text)
 
 
+def _rule_ok(t: str, rule: dict) -> bool:
+    if not all(w in t for w in rule.get("require_all", [])):
+        return False
+    return all(any(w in t for w in group) for group in rule.get("require_any", []))
+
+
 def matches(text: str, cfg: dict) -> bool:
+    """Past de tekst bij een van de gevolgde edities (en geen uitsluitwoord)?"""
     t = normalize(text)
     m = cfg["match"]
-    if not all(w in t for w in m["require_all"]):
+    if any(w in t for w in m["exclude"]):
         return False
-    for group in m["require_any"]:
-        if not any(w in t for w in group):
-            return False
-    return not any(w in t for w in m["exclude"])
+    rules = [m] + list(m.get("variants") or [])  # hoofdeditie + extra edities
+    return any(_rule_ok(t, r) for r in rules)
 
 
 def clean_url(url: str) -> str:
@@ -555,6 +563,7 @@ def run(verbose: bool) -> int:
     products = state.setdefault("products", {})
     # Een nieuwe productpagina is pas een signaal als we die shop al eerder bekeken
     # (anders geeft elke nieuw toegevoegde shop een stortvloed aan meldingen).
+    manual_urls = {clean_url(u) for u in cfg.get("product_urls") or []}
     known_shops = set(state.get("known_shops") or {p.get("shop") for p in products.values()})
     new_hits: list[Result] = []
     signals: list[tuple[Result, str]] = []
@@ -565,7 +574,8 @@ def run(verbose: bool) -> int:
             new_hits.append(r)
         elif r.status == "coming" and prev_status not in ("coming", "available"):
             signals.append((r, "De shop meldt dat de console binnenkort (weer) leverbaar is."))
-        elif prev is None and r.shop in known_shops and r.status not in ("error",):
+        elif (prev is None and r.shop in known_shops and r.status not in ("error",)
+              and r.url not in manual_urls):
             signals.append((r, "Nieuwe productpagina gevonden - vaak een voorbode van (nieuwe) voorraad."))
         if r.status in ("available", "coming", "unavailable", "expensive") or prev is None:
             products[r.url] = {

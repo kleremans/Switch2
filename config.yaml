@@ -12,6 +12,16 @@ match:
     - ["40th", "anniversary", "40-jarig", "40 jarig", "jubileum", "40e", "40ste",
        "jubilaeum", "jubiläum", "40. jubil", "40-jahre", "40 jahre",
        "anniversaire", "40e anniv", "40ème"]
+  # Extra edities die ook gevolgd worden (zelfde uitsluitwoorden als hierboven).
+  variants:
+    # Zelda: Ocarina of Time Limited Edition console. Er moet een console-woord in
+    # staan, anders zou ook de game "Ocarina of Time" (Switch 2) meetellen.
+    - name: Ocarina of Time Edition
+      require_all: ["zelda", "ocarina"]
+      require_any:
+        - ["switch 2", "switch-2", "switch2", "switch_2"]
+        - ["2026", "console", "konsole", "limited edition", "256 gb", "256gb",
+           "bundel", "bundle", "40th", "anniversary", "jubil"]
   exclude:
     - controller
     - amiibo
@@ -75,6 +85,7 @@ max_price: 650
 search_terms:
   - "switch 2 zelda"
   - "zelda 40th anniversary"
+  - "switch 2 zelda ocarina"
 
 # Hoeveel kandidaat-productpagina's per webshop maximaal bekeken worden.
 max_candidates_per_shop: 6
@@ -85,6 +96,9 @@ product_urls:
   - https://www.coolblue.nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
   - https://www.coolblue.be/nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html
   - https://www.coolblue.de/produkt/986118/nintendo-switch-2-the-legend-of-zelda-edition-zum-40-jubilaeum.html
+  # Ocarina of Time Edition
+  - https://www.coolblue.nl/product/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html
+  - https://www.coolblue.be/nl/product/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html
 
 # Vroege signalen (melding met prioriteit "hoog"):
 #  - een shop meldt "binnenkort weer leverbaar" / "demnächst verfügbar" e.d.
