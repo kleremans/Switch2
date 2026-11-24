@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-22T21:33:06+00:00",
+  "last_run": "2026-11-24T17:14:15+00:00",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -33,6 +33,15 @@
       "source": "text",
       "status": "unknown",
       "title": "Nintendo Switch 2 The Legend of Zelda Edition 40th Anniversary Nintendo Switch 2 The Legend of Zelda Edition 40th Anniversary"
+    },
+    "https://geizhals.de/6969576053": {
+      "country": "DE",
+      "last_change": "2026-11-24T17:14:15+00:00",
+      "price": "",
+      "shop": "Geizhals.de",
+      "source": "text",
+      "status": "unknown",
+      "title": "Nintendo Switch 2 Legend of Zelda 40th Anniversary Konsole NEU Nintendo Switch 2 Legend of Zelda 40th Anniversary Konsole NEU"
     },
     "https://geizhals.de/6990655247": {
       "country": "DE",
@@ -129,6 +138,24 @@
       "source": "jsonld",
       "status": "available",
       "title": "Nintendo Switch 2 (2026) + The Legend of Zelda: Ocarina of Time"
+    },
+    "https://www.mediamarkt.de/de/product/_nintendo-switch-2-zelda-ocarina-of-time-bundle-3077474.html": {
+      "country": "DE",
+      "last_change": "2026-11-24T17:14:15+00:00",
+      "price": "538.99",
+      "shop": "MediaMarkt.de",
+      "source": "jsonld",
+      "status": "available",
+      "title": "NINTENDO Switch 2 + Zelda: Ocarina Of Time Bundle"
+    },
+    "https://www.saturn.de/de/product/_nintendo-switch-2-zelda-ocarina-of-time-bundle-3077474.html": {
+      "country": "DE",
+      "last_change": "2026-11-24T17:14:15+00:00",
+      "price": "538.99",
+      "shop": "Saturn.de",
+      "source": "jsonld",
+      "status": "available",
+      "title": "NINTENDO Switch 2 + Zelda: Ocarina Of Time Bundle"
     }
   },
   "social_initialized": [
