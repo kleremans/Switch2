@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-24T09:16:48+00:00",
+  "last_run": "2026-11-24T13:25:20+00:00",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -111,6 +111,15 @@
       "shop": "Coolblue",
       "status": "error",
       "title": ""
+    },
+    "https://www.mediamarkt.nl/nl/product/_nintendo-nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition-256-gb-183623194.html": {
+      "country": "NL",
+      "last_change": "2026-11-24T13:25:20+00:00",
+      "price": "585",
+      "shop": "MediaMarkt",
+      "source": "jsonld",
+      "status": "available",
+      "title": "NINTENDO Nintendo Switch 2 - The Legend Of Zelda 40th Anniversary Edition 256 GB"
     }
   },
   "social_initialized": [
