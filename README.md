@@ -1,6 +1,6 @@
 # Zelda Switch 2 voorraad-monitor 🗡️🛡️
 
-Doorzoekt elk uur (07:00–23:00) webshops in Nederland, Duitsland en België op de **Nintendo Switch 2 – The Legend of
+Doorzoekt elke 15 minuten (07:00–23:00) webshops in Nederland, Duitsland en België op de **Nintendo Switch 2 – The Legend of
 Zelda 40th Anniversary Edition** (en de **Ocarina of Time Limited Edition**) en stuurt je direct een pushmelding op je telefoon
 zodra hij ergens op voorraad is.
 
@@ -124,18 +124,20 @@ Ga naar **Actions → Zelda Switch 2 monitor → Run workflow**:
 
 ## Tijden
 
-Elk uur tussen 07:00 en 23:00 Nederlandse tijd: **07:17, 08:17, … 22:17** (16x per
-dag), het hele jaar door (zomer- en wintertijd worden automatisch goed gezet).
+Elke 15 minuten tussen 07:00 en 23:00 Nederlandse tijd (**07:02, 07:17, 07:32,
+07:47, … 22:47**, 64x per dag), het hele jaar door. Zomer- en wintertijd worden
+automatisch goed gezet: de workflow start tussen 05 en 21 UTC en de eerste stap
+("Tijdvenster") laat alleen de Nederlandse uren 07–22 door. Andere uren? Pas de
+lijst `07|08|...|22` in `.github/workflows/monitor.yml` aan.
 
-Hoe: GitHub rekent alleen in UTC, dus de workflow start elk uur tussen 05 en 21 UTC
-en de eerste stap ("Tijdvenster") laat alleen de bovenstaande Nederlandse uren door.
-De overige start stopt meteen. Andere uren nodig? Pas de lijst `07|08|...|22` in
-`.github/workflows/monitor.yml` aan.
-
-> 💡 Restocks zijn vaak binnen minuten weer uitverkocht. Hoe vaker je controleert,
-> hoe groter de kans dat je op tijd bent. Voor een publieke repository zijn Actions
-> gratis; bij een privé-repository heb je 2000 gratis minuten per maand, en dit
-> schema gebruikt er ongeveer 1.500 (een run duurt nu ±2,5 minuut).
+> ⚠️ **GitHub Actions-minuten.** Een run duurt ±2,5 minuut (GitHub rekent per
+> begonnen minuut, dus 3). 64 runs per dag ≈ **5.800–6.000 minuten per maand**.
+> - **Openbare repository:** gratis en onbeperkt.
+> - **Privé repository:** 2.000 gratis minuten per maand. Die zijn na ±10 dagen
+>   op; daarna stopt de monitor tot de volgende maand, tenzij je betaling hebt
+>   ingesteld (±$0,008/minuut ≈ $30/maand extra).
+>   Oplossingen: maak de repository openbaar (Settings → General → Danger Zone), of
+>   zet de frequentie lager (elk uur ≈ 1.500 minuten).
 
 ## Bekende beperkingen
 
@@ -148,7 +150,7 @@ De overige start stopt meteen. Andere uren nodig? Pas de lijst `07|08|...|22` in
   `product_urls` in `config.yaml`. Die worden altijd gecontroleerd, ook als de
   zoekfunctie van de shop niet meewerkt.
 - GitHub zet geplande workflows uit na 60 dagen zonder activiteit in de repository.
-  Omdat de monitor elke run `state.json` bijwerkt, blijft hij actief.
+  Omdat de monitor minstens één keer per dag `state.json` bijwerkt, blijft hij actief.
 
 ## Lokaal draaien
 

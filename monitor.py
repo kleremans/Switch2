@@ -616,7 +616,10 @@ def run(verbose: bool) -> int:
         import social
         social.run(session, cfg, state, notify, log, verbose)
 
-    state["last_run"] = now
+    # Alleen de datum opslaan: zo komt er niet elke 15 minuten een commit bij, maar
+    # wel minstens één per dag (houdt de geplande workflow actief).
+    state.pop("last_run", None)
+    state["last_run_day"] = now[:10]
     save_state(state)
     if not new_hits:
         log("\nGeen nieuwe beschikbaarheid gevonden.")
