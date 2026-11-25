@@ -2,11 +2,12 @@ name: Zelda Switch 2 monitor
 
 on:
   schedule:
-    # Elk uur tussen 07:00 en 23:00 Nederlandse tijd: 07:17, 08:17, ... 22:17 (16x).
-    # GitHub rekent in UTC en kent geen zomer-/wintertijd, daarom start de cron elk
-    # uur tussen 05 en 21 UTC en laat de stap "Tijdvenster" alleen de juiste
-    # Nederlandse uren door. Minuut 17 omdat GitHub op het hele uur druk is.
-    - cron: "17 5-21 * * *"
+    # Elke 15 minuten tussen 07:00 en 23:00 Nederlandse tijd (07:02, 07:17, 07:32,
+    # 07:47, ... 22:47 = 64x per dag). GitHub rekent in UTC en kent geen zomer-/
+    # wintertijd, daarom start de cron tussen 05 en 21 UTC en laat de stap
+    # "Tijdvenster" alleen de juiste Nederlandse uren door. Minuten 02/17/32/47 omdat
+    # GitHub op het hele en halve uur druk is.
+    - cron: "2,17,32,47 5-21 * * *"
   workflow_dispatch:
     inputs:
       test_notify:
