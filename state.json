@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run": "2026-11-25T11:10:57+00:00",
+  "last_run": "2026-11-25T12:16:10+00:00",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -88,6 +88,24 @@
       "status": "unavailable",
       "title": "Nintendo Switch 2 (2025) - The Legend of Zelda - 40th Anniversary Edition"
     },
+    "https://www.coolblue.be/nl/abonnement/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
+      "country": "BE",
+      "last_change": "2026-11-25T12:16:10+00:00",
+      "price": "539",
+      "shop": "Coolblue.be",
+      "source": "jsonld",
+      "status": "unavailable",
+      "title": "Nintendo Switch 2 The Legend of Zelda 40th Anniversary Edition"
+    },
+    "https://www.coolblue.be/nl/abonnement/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html": {
+      "country": "BE",
+      "last_change": "2026-11-25T12:16:10+00:00",
+      "price": "549",
+      "shop": "Coolblue.be",
+      "source": "jsonld",
+      "status": "available",
+      "title": "Nintendo Switch 2 (2026) + The Legend of Zelda: Ocarina of Time"
+    },
     "https://www.coolblue.be/nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "BE",
       "last_change": "2026-11-13T19:10:07+00:00",
@@ -114,6 +132,24 @@
       "source": "jsonld",
       "status": "unavailable",
       "title": "Nintendo Switch 2 The Legend of Zelda Edition zum 40. Jubiläum"
+    },
+    "https://www.coolblue.nl/abonnement/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
+      "country": "NL",
+      "last_change": "2026-11-25T12:16:10+00:00",
+      "price": "539",
+      "shop": "Coolblue",
+      "source": "jsonld",
+      "status": "unavailable",
+      "title": "Nintendo Switch 2 The Legend of Zelda 40th Anniversary Edition"
+    },
+    "https://www.coolblue.nl/abonnement/988614/nintendo-switch-2-2026-the-legend-of-zelda-ocarina-of-time.html": {
+      "country": "NL",
+      "last_change": "2026-11-25T12:16:10+00:00",
+      "price": "549",
+      "shop": "Coolblue",
+      "source": "jsonld",
+      "status": "available",
+      "title": "Nintendo Switch 2 (2026) + The Legend of Zelda: Ocarina of Time"
     },
     "https://www.coolblue.nl/product/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "NL",
