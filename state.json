@@ -81,11 +81,11 @@
     },
     "https://tweakers.net/pricewatch/2386056/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "NL",
-      "last_change": "2026-11-20T19:08:06+00:00",
-      "price": "",
+      "last_change": "2026-11-26T13:59:07+00:00",
+      "price": "589.99",
       "shop": "Tweakers Pricewatch",
-      "source": "text",
-      "status": "unavailable",
+      "source": "jsonld",
+      "status": "available",
       "title": "Nintendo Switch 2 (2025) - The Legend of Zelda - 40th Anniversary Edition"
     },
     "https://www.coolblue.be/nl/abonnement/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
@@ -183,6 +183,15 @@
       "source": "jsonld",
       "status": "available",
       "title": "NINTENDO Switch 2 + Zelda: Ocarina Of Time Bundle"
+    },
+    "https://www.mediamarkt.nl/nl/product/_nintendo-nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition-256-gb-183623194.html": {
+      "country": "NL",
+      "last_change": "2026-11-26T13:59:07+00:00",
+      "price": "978.37",
+      "shop": "MediaMarkt",
+      "source": "jsonld",
+      "status": "expensive",
+      "title": "NINTENDO Nintendo Switch 2 - The Legend Of Zelda 40th Anniversary Edition 256 GB"
     },
     "https://www.saturn.de/de/product/_nintendo-switch-2-zelda-ocarina-of-time-bundle-3077474.html": {
       "country": "DE",
