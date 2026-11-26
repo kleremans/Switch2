@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run_day": "2026-11-25",
+  "last_run_day": "2026-11-26",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -178,7 +178,7 @@
     "https://www.mediamarkt.de/de/product/_nintendo-switch-2-zelda-ocarina-of-time-bundle-3077474.html": {
       "country": "DE",
       "last_change": "2026-11-24T17:14:15+00:00",
-      "price": "538.99",
+      "price": "529.98",
       "shop": "MediaMarkt.de",
       "source": "jsonld",
       "status": "available",
@@ -187,7 +187,7 @@
     "https://www.saturn.de/de/product/_nintendo-switch-2-zelda-ocarina-of-time-bundle-3077474.html": {
       "country": "DE",
       "last_change": "2026-11-24T17:14:15+00:00",
-      "price": "538.99",
+      "price": "529.98",
       "shop": "Saturn.de",
       "source": "jsonld",
       "status": "available",
