@@ -81,11 +81,11 @@
     },
     "https://tweakers.net/pricewatch/2386056/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "NL",
-      "last_change": "2026-11-26T13:59:07+00:00",
-      "price": "645",
+      "last_change": "2026-11-26T16:57:24+00:00",
+      "price": "",
       "shop": "Tweakers Pricewatch",
-      "source": "jsonld",
-      "status": "available",
+      "source": "text",
+      "status": "unavailable",
       "title": "Nintendo Switch 2 (2025) - The Legend of Zelda - 40th Anniversary Edition"
     },
     "https://www.coolblue.be/nl/abonnement/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
