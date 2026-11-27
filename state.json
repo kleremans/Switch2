@@ -23,7 +23,7 @@
     "Tweakers Pricewatch",
     "coolblue.nl"
   ],
-  "last_run_day": "2026-11-26",
+  "last_run_day": "2026-11-27",
   "products": {
     "https://geizhals.de/6898474562": {
       "country": "DE",
@@ -81,11 +81,11 @@
     },
     "https://tweakers.net/pricewatch/2386056/nintendo-switch-2-2025-the-legend-of-zelda-40th-anniversary-edition.html": {
       "country": "NL",
-      "last_change": "2026-11-26T16:57:24+00:00",
-      "price": "",
+      "last_change": "2026-11-27T07:00:59+00:00",
+      "price": "792.9",
       "shop": "Tweakers Pricewatch",
-      "source": "text",
-      "status": "unavailable",
+      "source": "jsonld",
+      "status": "expensive",
       "title": "Nintendo Switch 2 (2025) - The Legend of Zelda - 40th Anniversary Edition"
     },
     "https://www.coolblue.be/nl/abonnement/986118/nintendo-switch-2-the-legend-of-zelda-40th-anniversary-edition.html": {
@@ -274,7 +274,8 @@
       "427629",
       "427750",
       "428085",
-      "428427"
+      "428427",
+      "429631"
     ],
     "reddit": []
   }
